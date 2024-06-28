@@ -1,0 +1,655 @@
+Yes, for fetching images from a server, an internet connection is required. The process relies on accessing external resources via URLs, which necessitates connectivity to the server hosting those resources.
+
+If internet access is a concern, you have a few alternatives:
+
+Download Resources Locally: Before converting the HTML to PDF, download the images and other resources locally and modify the HTML to refer to the local paths. This way, you do not need an internet connection during the PDF conversion process.
+
+Embed Resources in HTML: Use Base64 encoding to embed images directly within the HTML. This approach eliminates the need for external requests during the PDF conversion.
+
+Alternative 1: Download Resources Locally
+Here's a basic example of how you can download images and modify the HTML to refer to local paths:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Change this to your HTML file path
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String localImageDir = "C:/htmltopdfusingjsoup/images/"; // Directory to store downloaded images
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Download images and update HTML to refer to local paths
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                URL imageUrl = new URL(src);
+                String imageName = Paths.get(imageUrl.getPath()).getFileName().toString();
+                String localImagePath = localImageDir + imageName;
+
+                // Download image
+                try (InputStream in = imageUrl.openStream()) {
+                    Files.copy(in, Paths.get(localImagePath));
+                }
+
+                // Update img src attribute
+                img.attr("src", localImagePath);
+            }
+
+            // Write modified HTML to a temporary file
+            File tempHtmlFile = new File("C:/htmltopdfusingjsoup/temp.html");
+            Files.write(tempHtmlFile.toPath(), htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(tempHtmlFile), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Alternative 2: Embed Resources in HTML
+Here's an example of how to embed images using Base64 encoding:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Change this to your HTML file path
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Embed images in HTML
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                byte[] imageBytes = Files.readAllBytes(Paths.get(src));
+                String base64 = Base64.getEncoder().encodeToString(imageBytes);
+                img.attr("src", "data:image/png;base64," + base64); // Change "image/png" to the correct type
+            }
+
+            // Write modified HTML to a temporary file
+            File tempHtmlFile = new File("C:/htmltopdfusingjsoup/temp.html");
+            Files.write(tempHtmlFile.toPath(), htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(tempHtmlFile), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Choose the method that best suits your needs. For both methods, you only need an internet connection initially to fetch resources; the actual conversion to PDF can be done offline.
+
+
+
+//If you don't have internet access and need to ensure that all resources are available locally for the HTML to PDF conversion, you can follow these steps:
+
+Download All External Resources: Download all images and other external resources (such as CSS, JavaScript files) required by your HTML file and save them locally.
+Modify the HTML to Use Local Paths: Update the paths in the HTML file to point to the local copies of the resources.
+Convert the Modified HTML to PDF: Use iText to convert the modified HTML file to PDF.
+Here's a step-by-step guide with code to achieve this:
+
+Step 1: Download External Resources
+Before running the conversion code, manually download all the images and resources required by your HTML file and save them in a local directory.
+
+Step 2: Modify the HTML to Use Local Paths
+Use a Java program to modify the HTML file to point to the local resources.
+
+Step 3: Convert the Modified HTML to PDF
+Here's the Java code that handles both modifying the HTML file and converting it to PDF:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String localResourceDir = "C:/htmltopdfusingjsoup/resources/"; // Directory with local resources
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Update paths in HTML to use local resources
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                String localImagePath = localResourceDir + Paths.get(new URL(src).getPath()).getFileName().toString();
+                img.attr("src", localImagePath);
+            }
+
+            for (Element link : htmlDoc.select("link[rel=stylesheet]")) {
+                String href = link.attr("href");
+                String localCssPath = localResourceDir + Paths.get(new URL(href).getPath()).getFileName().toString();
+                link.attr("href", localCssPath);
+            }
+
+            for (Element script : htmlDoc.select("script[src]")) {
+                String src = script.attr("src");
+                String localScriptPath = localResourceDir + Paths.get(new URL(src).getPath()).getFileName().toString();
+                script.attr("src", localScriptPath);
+            }
+
+            // Write modified HTML to a temporary file
+            File tempHtmlFile = new File("C:/htmltopdfusingjsoup/temp.html");
+            Files.write(tempHtmlFile.toPath(), htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(tempHtmlFile), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Explanation
+Parse HTML with JSoup: The program uses JSoup to parse the HTML file and find all <img>, <link>, and <script> tags.
+Update Paths to Local Resources: It modifies the src or href attributes to point to the local copies of the resources.
+Write Modified HTML to Temporary File: The modified HTML content is written to a temporary file.
+Convert HTML to PDF: The program then converts the temporary HTML file to PDF using iText.
+Notes
+Ensure all your local resources (images, CSS, JavaScript files) are placed in the localResourceDir directory.
+Adjust the paths and directory locations as per your requirements.
+Make sure the URLs in the original HTML file are absolute or properly formatted so they can be parsed and modified correctly.
+This approach allows you to work entirely offline by ensuring all required resources are available locally.
+
+
+//If you don't have internet access and need to ensure that all resources are available locally for the HTML to PDF conversion, you can follow these steps:
+
+Download All External Resources: Download all images and other external resources (such as CSS, JavaScript files) required by your HTML file and save them locally.
+Modify the HTML to Use Local Paths: Update the paths in the HTML file to point to the local copies of the resources.
+Convert the Modified HTML to PDF: Use iText to convert the modified HTML file to PDF.
+Here's a step-by-step guide with code to achieve this:
+
+Step 1: Download External Resources
+Before running the conversion code, manually download all the images and resources required by your HTML file and save them in a local directory.
+
+Step 2: Modify the HTML to Use Local Paths
+Use a Java program to modify the HTML file to point to the local resources.
+
+Step 3: Convert the Modified HTML to PDF
+Here's the Java code that handles both modifying the HTML file and converting it to PDF:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String localResourceDir = "C:/htmltopdfusingjsoup/resources/"; // Directory with local resources
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Update paths in HTML to use local resources
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                String localImagePath = localResourceDir + Paths.get(new URL(src).getPath()).getFileName().toString();
+                img.attr("src", localImagePath);
+            }
+
+            for (Element link : htmlDoc.select("link[rel=stylesheet]")) {
+                String href = link.attr("href");
+                String localCssPath = localResourceDir + Paths.get(new URL(href).getPath()).getFileName().toString();
+                link.attr("href", localCssPath);
+            }
+
+            for (Element script : htmlDoc.select("script[src]")) {
+                String src = script.attr("src");
+                String localScriptPath = localResourceDir + Paths.get(new URL(src).getPath()).getFileName().toString();
+                script.attr("src", localScriptPath);
+            }
+
+            // Write modified HTML to a temporary file
+            File tempHtmlFile = new File("C:/htmltopdfusingjsoup/temp.html");
+            Files.write(tempHtmlFile.toPath(), htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(tempHtmlFile), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Explanation
+Parse HTML with JSoup: The program uses JSoup to parse the HTML file and find all <img>, <link>, and <script> tags.
+Update Paths to Local Resources: It modifies the src or href attributes to point to the local copies of the resources.
+Write Modified HTML to Temporary File: The modified HTML content is written to a temporary file.
+Convert HTML to PDF: The program then converts the temporary HTML file to PDF using iText.
+Notes
+Ensure all your local resources (images, CSS, JavaScript files) are placed in the localResourceDir directory.
+Adjust the paths and directory locations as per your requirements.
+Make sure the URLs in the original HTML file are absolute or properly formatted so they can be parsed and modified correctly.
+This approach allows you to work entirely offline by ensuring all required resources are available locally.
+
+
+then give me the related html to above code
+ChatGPT
+Certainly! Below is an example HTML file that includes external resources such as images, CSS, and JavaScript. This HTML file can be used with the Java code provided earlier to convert it to a PDF.
+
+Example HTML File (satya.html)
+Save this HTML content in a file named satya.html in your C:/htmltopdfusingjsoup/ directory.
+
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample HTML to PDF</title>
+    <link rel="stylesheet" type="text/css" href="resources/style.css">
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a sample HTML file to demonstrate converting HTML to PDF with images, CSS, and JavaScript.</p>
+    <img src="resources/sample-image.jpg" alt="Sample Image">
+    <p id="dynamic-text"></p>
+    <script src="resources/script.js"></script>
+</body>
+</html>
+Example CSS File (style.css)
+Save this CSS content in a file named style.css in your C:/htmltopdfusingjsoup/resources/ directory.
+
+css
+Copy code
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+p {
+    font-size: 16px;
+}
+Example JavaScript File (script.js)
+Save this JavaScript content in a file named script.js in your C:/htmltopdfusingjsoup/resources/ directory.
+
+javascript
+Copy code
+document.getElementById('dynamic-text').textContent = "This text was added by JavaScript.";
+Example Image (sample-image.jpg)
+Place any image file named sample-image.jpg in your C:/htmltopdfusingjsoup/resources/ directory. Ensure the file exists and the path matches what is specified in the HTML.
+
+Directory Structure
+Your directory structure should look like this:
+
+arduino
+Copy code
+C:/
+└── htmltopdfusingjsoup/
+    ├── resources/
+    │   ├── style.css
+    │   ├── script.js
+    │   └── sample-image.jpg
+    ├── satya.html
+    └── satya.pdf
+How It Works
+HTML File: The HTML file (satya.html) includes references to a CSS file (style.css), a JavaScript file (script.js), and an image (sample-image.jpg).
+CSS and JavaScript Files: These files are placed in the resources directory and are referenced relatively in the HTML file.
+Image File: An image file named sample-image.jpg is also placed in the resources directory.
+When you run the Java code provided earlier, it will:
+
+Parse the satya.html file using JSoup.
+Modify the paths of the resources (images, CSS, JavaScript) to ensure they are correctly referenced from the local directory.
+Convert the modified HTML file to a PDF.
+This setup ensures that all resources are available locally, allowing you to convert the HTML to PDF without requiring an internet connection.
+
+i want both css html in single file
+ChatGPT
+To have both the HTML and CSS in a single file, you can embed the CSS directly within the HTML file using the <style> tag. Here's the updated example HTML file that includes embedded CSS and an image reference. The JavaScript can also be embedded within the HTML using the <script> tag.
+
+Example HTML File (satya.html)
+Save this HTML content in a file named satya.html in your C:/htmltopdfusingjsoup/ directory.
+
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample HTML to PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a sample HTML file to demonstrate converting HTML to PDF with images, CSS, and JavaScript.</p>
+    <img src="sample-image.jpg" alt="Sample Image">
+    <p id="dynamic-text"></p>
+    <script>
+        document.getElementById('dynamic-text').textContent = "This text was added by JavaScript.";
+    </script>
+</body>
+</html>
+Example Image (sample-image.jpg)
+Place any image file named sample-image.jpg in your C:/htmltopdfusingjsoup/ directory. Ensure the file exists and the path matches what is specified in the HTML.
+
+Directory Structure
+Your directory structure should look like this:
+
+arduino
+Copy code
+C:/
+└── htmltopdfusingjsoup/
+    ├── sample-image.jpg
+    ├── satya.html
+    └── satya.pdf
+How It Works
+HTML File: The HTML file (satya.html) includes embedded CSS and JavaScript, and references an image (sample-image.jpg).
+Image File: An image file named sample-image.jpg is placed in the same directory as the HTML file.
+When you run the Java code provided earlier, it will:
+
+Parse the satya.html file using JSoup.
+Modify the paths of the image to ensure it is correctly referenced from the local directory.
+Convert the modified HTML file to a PDF.
+Updated Java Code
+Here's the Java code that handles modifying the image path in the HTML file and converting it to PDF:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String localResourceDir = "C:/htmltopdfusingjsoup/"; // Directory with local resources
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Update paths in HTML to use local resources
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                String localImagePath = localResourceDir + Paths.get(src).getFileName().toString();
+                img.attr("src", localImagePath);
+            }
+
+            // Write modified HTML to a temporary file
+            File tempHtmlFile = new File("C:/htmltopdfusingjsoup/temp.html");
+            Files.write(tempHtmlFile.toPath(), htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(tempHtmlFile), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+This setup ensures that all resources are embedded within the HTML file, allowing you to convert the HTML to PDF without requiring an internet connection.
+
+why here we use temp file
+ChatGPT
+Using a temporary file is necessary because we modify the original HTML to ensure all resource paths are correct before passing it to the iText library for conversion. However, if you want to avoid using a temporary file, you can modify the HTML content in-memory and then directly convert it to PDF.
+
+Here’s the updated Java code that avoids creating a temporary file by working with in-memory HTML content:
+
+java
+Copy code
+package s4;
+
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+
+public class HtmlToPdf {
+    public static void main(String[] args) {
+        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String localResourceDir = "C:/htmltopdfusingjsoup/"; // Directory with local resources
+
+        try {
+            // Parse HTML with JSoup
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
+
+            // Update paths in HTML to use local resources
+            for (Element img : htmlDoc.select("img")) {
+                String src = img.attr("src");
+                String localImagePath = localResourceDir + Paths.get(src).getFileName().toString();
+                img.attr("src", localImagePath);
+            }
+
+            // Convert modified HTML content to PDF
+            ByteArrayInputStream modifiedHtmlStream = new ByteArrayInputStream(htmlDoc.outerHtml().getBytes());
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
+
+            // Convert HTML to PDF
+            HtmlConverter.convertToPdf(modifiedHtmlStream, pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Explanation
+Parse HTML with JSoup: The HTML file (satya.html) is parsed using JSoup.
+Update Paths to Local Resources: The src attribute of the <img> tags is modified to point to the local copies of the images.
+In-Memory HTML Modification: The modified HTML content is converted to a ByteArrayInputStream instead of being written to a temporary file.
+Convert HTML to PDF: The HtmlConverter.convertToPdf method is used to convert the in-memory HTML content directly to a PDF file.
+Steps to Ensure Resources are Local
+HTML File: Ensure the HTML file (satya.html) includes embedded CSS and JavaScript, and references an image (sample-image.jpg).
+Image File: Ensure the image file (sample-image.jpg) is placed in the same directory as the HTML file.
+Directory Structure
+Your directory structure should look like this:
+
+arduino
+Copy code
+C:/
+└── htmltopdfusingjsoup/
+    ├── sample-image.jpg
+    ├── satya.html
+    └── satya.pdf
+By using in-memory HTML content, you avoid creating and managing temporary files, making the process more streamlined and efficient.
+
+
+
+
+
+
+
+
+
+
+
+
