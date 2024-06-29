@@ -1,67 +1,78 @@
-package s2;
+package s5;
 
-import com.itextpdf.html2pdf.ConverterProperties;
+
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.properties.UnitValue;
-import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 
 public class HtmlToPdf {
     public static void main(String[] args) {
-        // Input HTML file
-        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html";
-        // Output PDF file
-        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf";
+        String htmlFilePath = "C:/htpdfbox/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htpdfbox/satya.pdf"; // Path to save PDF file
+        String tempHtmlFilePath = "C:/htpdfbox/temp.html"; // Temporary HTML file path
+        String imagesFolder = "C:/htpdfbox/images"; // Folder to save decoded images
 
-        convertHtmlToPdf(htmlFilePath, pdfFilePath);
-    }
+        try {
+            // Parse the HTML file
+            Document htmlDoc = Jsoup.parse(new File(htmlFilePath), "UTF-8");
 
-    public static void convertHtmlToPdf(String htmlFilePath, String pdfFilePath) {
-        // Create a PdfWriter
-        try (PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFilePath))) {
-            // Set the page size to A4 landscape
-            PageSize pageSize = PageSize.A4.rotate();
-            // Create a PdfDocument with the specified page size
-            PdfDocument pdfDocument = new PdfDocument(writer);
-            pdfDocument.setDefaultPageSize(pageSize);
-            Document document = new Document(pdfDocument);
+            // Create the images folder if it does not exist
+            Files.createDirectories(Paths.get(imagesFolder));
 
-            // Adjust margins to avoid content cutting off
-            float leftMargin = 5; // Decrease left margin
-            float rightMargin = 20;
-            float topMargin = 20;
-            float bottomMargin = 20;
-            document.setMargins(topMargin, rightMargin, bottomMargin, leftMargin);
+            // Find all image elements
+            Elements imgElements = htmlDoc.select("img");
 
-            // Create the ConverterProperties
-            ConverterProperties converterProperties = new ConverterProperties();
-            converterProperties.setCharset("UTF-8");
+            // Process each image element
+            for (Element imgElement : imgElements) {
+                String imgSrc = imgElement.attr("src");
 
-            // Ensure proper font rendering
-            DefaultFontProvider fontProvider = new DefaultFontProvider(true, true, true);
-            converterProperties.setFontProvider(fontProvider);
+                // Check if the image source is Base64 encoded
+                if (imgSrc.startsWith("data:image")) {
+                    // Extract the Base64 string from the image source
+                    String base64Image = imgSrc.split(",")[1];
+                    // Decode Base64 string to bytes
+                    byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+                    // Generate a unique file name
+                    String imageName = "image_" + System.currentTimeMillis() + ".png";
+                    // Write decoded bytes to a file
+                    try (OutputStream out = new FileOutputStream(Paths.get(imagesFolder, imageName).toFile())) {
+                        out.write(imageBytes);
+                    }
+                    // Update the src attribute to the local path
+                    imgElement.attr("src", imagesFolder + "/" + imageName);
+                }
+            }
 
-            // Base URI for resolving relative URLs in the HTML
-            converterProperties.setBaseUri(new File(htmlFilePath).getParent());
+            // Save the updated HTML to a temporary file
+            try (FileWriter writer = new FileWriter(tempHtmlFilePath)) {
+                writer.write(htmlDoc.html());
+            }
 
-            // Read the HTML file
-            FileInputStream htmlStream = new FileInputStream(new File(htmlFilePath));
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(pdfFilePath);
 
-            // Convert HTML to PDF
-            HtmlConverter.convertToPdf(htmlStream, pdfDocument, converterProperties);
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
 
-            // Close the document
-            document.close();
+            // Set the page size to A3 Landscape
+            pdf.setDefaultPageSize(PageSize.A3.rotate());
 
-            System.out.println("PDF created successfully.");
+            // Convert updated HTML to PDF
+            HtmlConverter.convertToPdf(new FileInputStream(new File(tempHtmlFilePath)), pdf);
+
+            pdf.close();
+            System.out.println("PDF Created!");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
