@@ -1,4 +1,5 @@
-package s4;
+package s5;
+
 
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.geom.PageSize;
@@ -10,17 +11,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 
 public class HtmlToPdf {
     public static void main(String[] args) {
-        String htmlFilePath = "C:/htmltopdfusingjsoup/satya.html"; // Path to your HTML file
-        String pdfFilePath = "C:/htmltopdfusingjsoup/satya.pdf"; // Path to save PDF file
-        String tempHtmlFilePath = "C:/htmltopdfusingjsoup/temp.html"; // Temporary HTML file path
-        String imagesFolder = "C:/htmltopdfusingjsoup/images"; // Folder to save downloaded images
+        String htmlFilePath = "C:/htpdfbox/satya.html"; // Path to your HTML file
+        String pdfFilePath = "C:/htpdfbox/satya.pdf"; // Path to save PDF file
+        String tempHtmlFilePath = "C:/htpdfbox/temp.html"; // Temporary HTML file path
+        String imagesFolder = "C:/htpdfbox/images"; // Folder to save decoded images
 
         try {
             // Parse the HTML file
@@ -32,23 +32,25 @@ public class HtmlToPdf {
             // Find all image elements
             Elements imgElements = htmlDoc.select("img");
 
-            // Download images and update src attributes
+            // Process each image element
             for (Element imgElement : imgElements) {
-                String imgUrl = imgElement.attr("src");
-                String imageName;
+                String imgSrc = imgElement.attr("src");
 
-                // Check if the image source is a URL or a local path
-                if (isValidURL(imgUrl)) {
-                    imageName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
-                    downloadImageFromURL(imgUrl, imagesFolder, imageName);
-                } else {
-                    imageName = new File(imgUrl).getName();
-                    // If it's a local path, copy the file to the images folder
-                    copyLocalImage(imgUrl, imagesFolder, imageName);
+                // Check if the image source is Base64 encoded
+                if (imgSrc.startsWith("data:image")) {
+                    // Extract the Base64 string from the image source
+                    String base64Image = imgSrc.split(",")[1];
+                    // Decode Base64 string to bytes
+                    byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+                    // Generate a unique file name
+                    String imageName = "image_" + System.currentTimeMillis() + ".png";
+                    // Write decoded bytes to a file
+                    try (OutputStream out = new FileOutputStream(Paths.get(imagesFolder, imageName).toFile())) {
+                        out.write(imageBytes);
+                    }
+                    // Update the src attribute to the local path
+                    imgElement.attr("src", imagesFolder + "/" + imageName);
                 }
-
-                // Update the src attribute to the local path
-                imgElement.attr("src", imagesFolder + "/" + imageName);
             }
 
             // Save the updated HTML to a temporary file
@@ -74,27 +76,5 @@ public class HtmlToPdf {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // Helper method to check if a string is a valid URL
-    private static boolean isValidURL(String urlString) {
-        try {
-            new URL(urlString);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // Helper method to download an image from a URL and override existing file if present
-    private static void downloadImageFromURL(String imgUrl, String destinationFolder, String imageName) throws IOException {
-        try (InputStream in = new URL(imgUrl).openStream()) {
-            Files.copy(in, Paths.get(destinationFolder, imageName), StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
-
-    // Helper method to copy a local image file to the destination folder and override existing file if present
-    private static void copyLocalImage(String sourcePath, String destinationFolder, String imageName) throws IOException {
-        Files.copy(Paths.get(sourcePath), Paths.get(destinationFolder, imageName), StandardCopyOption.REPLACE_EXISTING);
     }
 }
