@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            word-wrap: break-word; /* Allow long words to break and wrap */
+            max-width: 300px; /* Adjust maximum width as needed */
+            vertical-align: top; /* Align content to the top of cells */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="js/html2canvas.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div id="content">
+        <h1>Hello, World!</h1>
+        <p>This is a PDF generation example.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>City</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Gender</th>
+                    <th>Status</th>
+                    <th>Form</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>30</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn, NY 11201</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>25</td>
+                    <td>Los Angeles</td>
+                    <td>jane.smith@example.com</td>
+                    <td>456 Oak Ave, Suite 200, Los Angeles, CA 90036</td>
+                    <td>Female</td>
+                    <td>Married</td>
+                    <td>Form B</td>
+                </tr>
+                <tr>
+                    <td>Mike Johnson</td>
+                    <td>35</td>
+                    <td>Chicago</td>
+                    <td>mike.johnson@example.com</td>
+                    <td>789 Elm Blvd, Chicago, IL 60611</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form C</td>
+                </tr>
+                <tr>
+                    <td>Mary Brown</td>
+                    <td>288888888888888888888888888888888888888888888888888888888888888888888888</td>
+                    <td>Miami</td>
+                    <td>mary.brown@example.com</td>
+                    <td>234 Pine St, Miami, FL 33131</td>
+                    <td>Female</td>
+                    <td>Divorced</td>
+                    <td>Form D</td>
+                </tr>
+                <tr>
+                    <td>Emily White</td>
+                    <td>32</td>
+                    <td>San Francisco</td>
+                    <td>emily.white@example.com</td>
+                    <td>567 Maple Ave, San Francisco, CA 94107</td>
+                    <td>Femalddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddde</td>
+                    <td>Single</td>
+                    <td>Form E</td>
+                </tr>
+                <tr>
+                    <td>David Lee</td>
+                    <td>27</td>
+                    <td>Boston</td>
+                    <td>david.lee@example.com</td>
+                    <td>890 Cedar St, Apartment 12C, Boston, MA 02110</td>
+                    <td>Male</td>
+                    <td>Marrieddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</td>
+                    <td>Form F</td>
+                </tr>
+ <tr>
+                    <td>Mary Brown</td>
+                    <td>28</td>
+                    <td>Miami</td>
+                    <td>mary.brown@example.com</td>
+                    <td>234 Pine St, Miami, FL 33131</td>
+                    <td>Female</td>
+                    <td>Divorced</td>
+                    <td>Form D</td>
+                </tr>
+ <tr>
+                    <td>Mary Brown</td>
+                    <td>28</td>
+                    <td>Miami</td>
+                    <td>mary.brown@example.com</td>
+                    <td>234 Pine St, Miami, FL 33131</td>
+                    <td>Female</td>
+                    <td>Divorced</td>
+                    <td>Form D</td>
+                </tr>
+ <tr>
+                    <td>Mary Brown</td>
+                    <td>28</td>
+                    <td>Miami</td>
+                    <td>mary.brown@example.com</td>
+                    <td>234 Pine St, Miami, FL 33131</td>
+                    <td>Female</td>
+                    <td>Divorced</td>
+                    <td>Form D</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <button id="generate-pdf">Generate PDF</button>
+    
+    <script>
+        document.getElementById('generate-pdf').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+
+            html2canvas(document.querySelector("#content")).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save("download.pdf");
+            }).catch(error => {
+                console.error("html2canvas Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
