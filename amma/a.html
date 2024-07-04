@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PDF</title>
+    <style>
+        table, tr, td, th {
+            border-collapse: collapse;
+            border: solid 1px #000;
+            padding: 8px;
+        }
+        td {
+            word-break: break-all;
+        }
+    </style>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div id="content">
+        <h1>Hello, World!</h1>
+        <p>This is a PDF generation example.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>City</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Gender</th>
+                    <th>Status</th>
+                    <th>Form</th>
+                    <th>Blood Group</th>
+					<th>status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example rows -->
+                <tr>
+                    <td>John Doe</td>
+                    <td>1</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn, NY 112011111111111111111111111111111111111111111</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				   <tr>
+                    <td>John Doe</td>
+                    <td>2</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn, NY 1120</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				  <tr>
+                    <td>John Doe</td>
+                    <td>3</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn, NY</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				  <tr>
+                    <td>John Doe</td>
+                    <td>4</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn, N</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				  <tr>
+                    <td>John Doe</td>
+                    <td>5</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+                   <tr>
+                    <td>John Doe</td>
+                    <td>6</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>7</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>8</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>9</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male5555555555555555555555555555555555555555555555555555555555555555555555</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>10</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>11</td>
+                    <td>New York Cityuuuuu</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>12</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>13</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>14</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>15</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>16</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>17</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>18</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>19</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+				 <tr>
+                    <td>John Doe</td>
+                    <td>20</td>
+                    <td>New York City</td>
+                    <td>john.doe@example.com</td>
+                    <td>123 Main St, Apartment 4B, Brooklyn</td>
+                    <td>Male</td>
+                    <td>Single</td>
+                    <td>Form A</td>
+                    <td>O +ve</td>
+					 <td>done</td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+    </div>
+    <button id="generate-pdf">Generate PDF</button>
+
+    <script>
+        document.getElementById('generate-pdf').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+
+            // Get table headers
+            const headers = Array.from(document.querySelectorAll('#content thead tr th')).map(header => header.innerText);
+
+            // Get table data
+            const rows = Array.from(document.querySelectorAll('#content tbody tr')).map(row =>
+                Array.from(row.cells).map(cell => cell.innerText)
+            );
+
+            // Calculate maximum number of columns
+            const maxColumns = headers.length;
+
+            // Adjust column widths dynamically based on the number of columns
+            const pageWidth = pdf.internal.pageSize.getWidth() - 20; // Page width minus margins
+            const columnWidth = pageWidth / maxColumns;
+
+            // Use autoTable plugin with dynamic column width options
+            pdf.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 20,
+                theme: 'grid',
+                headStyles: { fillColor: [100, 100, 255] },
+                pageBreak: 'auto',
+                bodyStyles: { minCellHeight: 10 },
+                styles: {
+                    overflow: 'linebreak',  // Enable word wrapping
+                    cellWidth: 'wrap',      // Set cell width to wrap text
+                    fontSize: 8
+                },
+                columnStyles: Array(maxColumns).fill().reduce((acc, _, index) => {
+                    acc[index] = { cellWidth: columnWidth };
+                    return acc;
+                }, {}),
+                didDrawPage: function (data) {
+                    if (data.pageNumber > 1) {
+                        // Optional: Add headers for subsequent pages
+                        pdf.text('Page ' + data.pageNumber, 10, 10);
+                    }
+                }
+            });
+
+            // Save the PDF
+            pdf.save('download.pdf');
+        });
+    </script>
+</body>
+</html>
